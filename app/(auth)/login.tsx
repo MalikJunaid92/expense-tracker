@@ -4,6 +4,7 @@ import Input from "@/components/Input";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
+import { useAuth } from "@/contexts/authContext";
 import { verticalScale } from "@/utils/styling";
 import { useRouter } from "expo-router";
 import * as Icons from "phosphor-react-native";
@@ -12,13 +13,19 @@ import { Alert, Pressable, StyleSheet, View } from "react-native";
 const Login = () => {
   const emailRef = useRef("");
   const passwordRef = useRef("");
+  const { login: loginUser } = useAuth();
+
   const handleSubmit = async () => {
     if (!emailRef.current || !passwordRef.current) {
       Alert.alert("Login", "Please fill all fields");
       return;
     }
-    console.log("Email:", emailRef.current);
-    console.log("Password:", passwordRef.current);
+    setIsLoading(true);
+    const res = await loginUser(emailRef.current, passwordRef.current);
+    setIsLoading(false);
+    if (!res.success) {
+      Alert.alert("Login Failed", res.msg);
+    }
   };
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
