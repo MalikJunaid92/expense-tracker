@@ -30,7 +30,6 @@ const Wallet = () => {
     where("uid", "==", user?.uid as string),
     orderBy("created", "desc"),
   ]);
-  console.log("wallets:", wallets.length);
 
   return (
     <ScreenWrapper style={{ backgroundColor: colors.black }}>
