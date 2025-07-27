@@ -13,8 +13,11 @@ import * as Icons from "phosphor-react-native";
 import React from "react";
 import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 const Wallet = () => {
-  const getTotalBalance = () => {
-    return 2367;
+  const getTotalBalance = (): number => {
+    return wallets.reduce((total, item) => {
+      total += item.amount || 0;
+      return total;
+    }, 0);
   };
   const router = useRouter();
   const { user } = useAuth();
