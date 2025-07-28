@@ -1,8 +1,14 @@
-import { expenseCategories } from "@/constants/data";
+import { expenseCategories, incomeCategory } from "@/constants/data";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
-import { TransactionItemProps, TransactionListType } from "@/types";
+import {
+  TransactionItemProps,
+  TransactionListType,
+  TransactionType,
+} from "@/types";
 import { verticalScale } from "@/utils/styling";
 import { FlashList } from "@shopify/flash-list";
+import { useRouter } from "expo-router";
+import { Timestamp } from "firebase/firestore";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -14,8 +20,22 @@ const TransactionList = ({
   loading,
   emptyListMessage,
 }: TransactionListType) => {
-  const handleClick = () => {
-    // Handle click event for transaction item
+  const router = useRouter();
+  const handleClick = (item: TransactionType) => {
+    router.push({
+      pathname: "/(modals)/transactionModal",
+      params: {
+        id: item?.id,
+        type: item?.type,
+        amount: item?.amount,
+        category: item?.category,
+        date: (item?.date as Timestamp).toDate().toISOString(),
+        description: item?.description,
+        image: item?.image,
+        uid: item?.uid,
+        walletId: item?.walletId,
+      },
+    });
   };
   return (
     <View style={styles.container}>
@@ -59,8 +79,13 @@ const TransactionItem = ({
   index,
   handleClick,
 }: TransactionItemProps) => {
-  const category = expenseCategories["utilities"]; // Example category, replace with actual logic to get category based on item
+  const category =
+    item?.type == "income" ? incomeCategory : expenseCategories[item.category!];
   const IconComponent = category?.icon;
+  const date = (item?.date as Timestamp).toDate()?.toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "short",
+  });
   return (
     <Animated.View
       entering={FadeInDown.delay(index * 50)
@@ -84,15 +109,18 @@ const TransactionItem = ({
             color={colors.neutral400}
             textProps={{ numberOfLines: 1 }}
           >
-            paid wifi bill
+            {item?.description}
           </Typo>
         </View>
         <View style={styles.amountDate}>
-          <Typo fontWeight={"500"} color={colors.rose}>
-            - $23
+          <Typo
+            fontWeight={"500"}
+            color={item?.type == "income" ? colors.green : colors.rose}
+          >
+            {`${item?.type == "income" ? "+ $" : "-$"}${item?.amount}`}
           </Typo>
           <Typo size={12} color={colors.neutral400}>
-            12 Jan
+            {date}
           </Typo>
         </View>
       </TouchableOpacity>
