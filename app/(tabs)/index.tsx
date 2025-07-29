@@ -37,11 +37,14 @@ const Home = () => {
             <Typo size={16} color={colors.neutral400}>
               Hello,
             </Typo>
-            <Typo size={20} color={colors.neutral400}>
+            <Typo size={20} fontWeight="500">
               {user?.name}
             </Typo>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity
+            style={styles.searchIcon}
+            onPress={() => router.push("/(modals)/searchModal" as any)}
+          >
             <Icons.MagnifyingGlassIcon
               size={verticalScale(22)}
               color={colors.neutral200}
